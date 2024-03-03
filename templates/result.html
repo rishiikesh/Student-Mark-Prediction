@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+
+    <!-- Include Plotly JavaScript library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Prediction Result for Roll Number {{ roll_number }}</h2>
+    <p>Linear Regression Prediction: {{ linear_prediction }}</p>
+    <p>Decision Tree Prediction: {{ decision_tree_prediction }}</p>
+    <p>Random Forest Prediction: {{ random_forest_prediction }}</p>
+    
+    <!-- Display the main plot -->
+    {{ main_plot|safe }}
+
+    <!-- Display feature plots -->
+    {{ feature_plots|safe }}
+
+</body>
+</html>

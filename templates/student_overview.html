@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Overview</title>
+    <!-- Add any additional CSS styles or libraries here -->
+</head>
+<body>
+    <h1>Student Overview for Roll Number {{ roll_number }}</h1>
+
+    <!-- Display student data here -->
+    <table>
+        <tr>
+            <th>Roll Number</th>
+            <th>Attendance</th>
+            <th>Marks_Sem1</th>
+            <th>Marks_Sem2</th>
+            <th>Marks_Sem3</th>
+            <th>Marks_Sem4</th>
+            <th>Marks_Sem5</th>
+            <th>Hours Studied</th>
+            <th>Marks</th>
+        </tr>
+        {% for index, row in student_data.iterrows() %}
+            <tr>
+                <td>{{ row['roll_number'] }}</td>
+                <td>{{ row['Attendance'] }}</td>
+                <td>{{ row['Marks_Sem1'] }}</td>
+                <td>{{ row['Marks_Sem2'] }}</td>
+                <td>{{ row['Marks_Sem3'] }}</td>
+                <td>{{ row['Marks_Sem4'] }}</td>
+                <td>{{ row['Marks_Sem5'] }}</td>
+                <td>{{ row['Hours_Studied'] }}</td>
+                <td>{{ row['marks'] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Add links to navigate back to the home page or other sections -->
+    <a href="{{ url_for('home') }}">Go back to Home</a>
+</body>
+</html>

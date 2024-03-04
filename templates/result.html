@@ -27,6 +27,10 @@
             height: auto;
             margin-top: 20px;
         }
+
+        .plot-container {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +44,27 @@
 
     <!-- Display feature plots -->
     {{ feature_plots|safe }}
+
+    <div>
+    <p>MAE: {{ mae }}</p>
+    <p>MSE: {{ mse }}</p>
+    <p>R-squared: {{ r_squared }}</p>
+    </div>
+
+    <!-- Display feature importance plot 
+    <div>{{ feature_importance_plot | safe }}</div> -->
+
+    <!-- Add buttons or links to navigate to individual marks and student overview -->
+    <div>
+        <a href="{{ url_for('student_overview', roll_number=roll_number) }}">View Student Overview</a>
+        <a href="{{ url_for('individual_model_prediction', roll_number=roll_number, model_name='linear') }}">View Linear Model Prediction</a>
+        <!-- Add other links as needed -->
+    </div>
+
+    <!-- Add other content or links as needed -->
+
+    <!-- Add links to navigate back to the home page or other sections -->
+    <a href="{{ url_for('home') }}">Go back to Home</a>
 
 </body>
 </html>

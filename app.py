@@ -4,12 +4,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import plotly.express as px
+import plotly.graph_objects as go
 
 app = Flask(__name__)
 
-# Generate synthetic data with study hours and attendance
-file_path = "C:/Users/rishi/OneDrive/Desktop/Creations/attendance_data.xlsx"  # Replace with the actual file path
+file_path = "C:/Users/rishi/OneDrive/Desktop/Creations/attendance_data.xlsx"  
 df = pd.read_excel(file_path)
 
 # Assuming you want to predict 'marks' based on all features
@@ -30,6 +31,24 @@ linear_model.fit(X_train, y_train)
 decision_tree_model.fit(X_train, y_train)
 random_forest_model.fit(X_train, y_train)
 
+# Function to evaluate model metrics
+def evaluate_model(y_true, y_pred):
+    mae = mean_absolute_error(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
+    r_squared = r2_score(y_true, y_pred)
+    return mae, mse, r_squared
+
+# Function to get feature importance
+def get_feature_importance(model, feature_names):
+    if hasattr(model, 'feature_importances_'):
+        importance = model.feature_importances_
+        data = {'Feature': feature_names, 'Importance': importance}
+        df_importance = pd.DataFrame(data)
+        return px.bar(df_importance, x='Feature', y='Importance', title='Feature Importance')
+    else:
+        return None
+
+# Function to predict marks for a given roll number
 def predict_marks_for_roll_number(roll_number, models, X, roll_numbers):
     if roll_number in roll_numbers.values:
         features = X[roll_numbers == roll_number]
@@ -42,6 +61,7 @@ def predict_marks_for_roll_number(roll_number, models, X, roll_numbers):
     else:
         return None
 
+# Function to generate main plot
 def get_prediction_plots(roll_number, predictions, model_names):
     num_plots = len(model_names)
 
@@ -52,6 +72,7 @@ def get_prediction_plots(roll_number, predictions, model_names):
 
     return plot_div
 
+# Function to generate feature plots
 def get_feature_plots(X):
     num_plots = X.shape[1]
 
@@ -62,10 +83,39 @@ def get_feature_plots(X):
 
     return plot_div
 
+# Function to render the student overview page
+@app.route('/student/<int:roll_number>')
+def student_overview(roll_number):
+    if roll_number in roll_numbers.values:
+        student_data = df[df['roll_number'] == roll_number]
+        return render_template('student_overview.html', roll_number=roll_number, student_data=student_data)
+    else:
+        return render_template('not_found.html', roll_number=roll_number)
+
+# Function to render individual model prediction page
+@app.route('/model/<int:roll_number>/<model_name>')
+def individual_model_prediction(roll_number, model_name):
+    models_dict = {'linear': linear_model, 'decision_tree': decision_tree_model, 'random_forest': random_forest_model}
+    
+    if roll_number in roll_numbers.values and model_name in models_dict:
+        model = models_dict[model_name]
+        features = X[roll_numbers == roll_number]
+
+        prediction = model.predict(features)[0]
+
+        return render_template('individual_model_prediction.html', 
+                               roll_number=roll_number,
+                               model_name=model_name.capitalize(),
+                               prediction=prediction)
+    else:
+        return render_template('not_found.html', roll_number=roll_number)
+
+# Function to render the home page
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# Function to handle the prediction form submission
 @app.route('/predict', methods=['POST'])
 def predict():
     roll_number = int(request.form['roll_number'])
@@ -75,6 +125,12 @@ def predict():
     if predictions:
         linear_prediction, decision_tree_prediction, random_forest_prediction = predictions
         model_names = ['Linear Regression', 'Decision Tree', 'Random Forest']
+
+        # Model evaluation metrics
+        mae, mse, r_squared = evaluate_model(y_test, random_forest_model.predict(X_test))
+
+        # Feature importance for Random Forest
+        feature_importance_plot = get_feature_importance(random_forest_model, X.columns)
 
         # Generate the main plot
         main_plot = get_prediction_plots(roll_number, [linear_prediction, decision_tree_prediction, random_forest_prediction], model_names)
@@ -87,6 +143,10 @@ def predict():
                                linear_prediction=linear_prediction,
                                decision_tree_prediction=decision_tree_prediction,
                                random_forest_prediction=random_forest_prediction,
+                               mae=mae,
+                               mse=mse,
+                               r_squared=r_squared,
+                               feature_importance_plot=feature_importance_plot,
                                main_plot=main_plot,
                                feature_plots=feature_plots)
     else:

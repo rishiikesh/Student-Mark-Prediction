@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Model Prediction</title>
+    <!-- Add any additional CSS styles or libraries here -->
+</head>
+<body>
+    <h1>{{ model_name }} Model Prediction for Roll Number {{ roll_number }}</h1>
+
+    <!-- Display individual model prediction here -->
+    <p>The predicted marks using the {{ model_name }} model is: {{ prediction }}</p>
+
+    <!-- Add links to navigate back to the home page or other sections -->
+    <a href="{{ url_for('home') }}">Go back to Home</a>
+</body>
+</html>
